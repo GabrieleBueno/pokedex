@@ -1,22 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { getPokemons } from '@/service/getPokemons';
-import { getIdByUrl } from '@/utils/getIdByUrl';
+import { getIdByUrl, capitalizeName, getPokemonImage } from '@/utils';
+
+import { formatPokemonTypes } from '../helper';
 import { getPokemonDetails } from '../getPokemonDetails';
-import { formatPokemonFirstType } from '../helper/formatPokemonFirstType';
-import { getPokemonImage } from '@/utils/getPokemonImage';
-import { POKEMON_TYPE_COLORS } from '@/assets/typeColors';
 
-export type Pokemon = {
-  id: number;
-  name: string;
-  image: string;
-  type: {
-    name: string;
-    color: string;
-  };
-};
+import type { Pokemon } from '../types';
 
-type UseGetPokemonsResult = {
+export type UseGetPokemonsResult = {
   pokemons: Pokemon[];
   isLoading: boolean;
   error: string | null;
@@ -30,7 +22,7 @@ export const useGetPokemons = (): UseGetPokemonsResult => {
   const [offset, setOffset] = useState<number>(0);
   const limit = 18;
 
-  const fetchPokemons = async () => {
+  const fetchPokemons = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -41,15 +33,15 @@ export const useGetPokemons = (): UseGetPokemonsResult => {
         data.map(async (item) => {
           const id = getIdByUrl(item.url);
           const pokemonTypes = await getPokemonDetails(id);
-          const pokemonFirstType = formatPokemonFirstType(pokemonTypes.types);
+          const [pokemonFirstType] = formatPokemonTypes(pokemonTypes.types);
 
           return {
             id,
-            name: item.name,
+            name: capitalizeName(item.name),
             image: getPokemonImage(id),
             type: {
               name: pokemonFirstType.name,
-              color: POKEMON_TYPE_COLORS[pokemonFirstType.name],
+              color: pokemonFirstType.color,
             },
           };
         })
@@ -61,17 +53,19 @@ export const useGetPokemons = (): UseGetPokemonsResult => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [offset]);
 
-  const fetchNextPage = () => {
+  const fetchNextPage = useCallback(() => {
     if (!isLoading) {
       setOffset((prevOffset) => prevOffset + limit);
     }
-  };
+  }, [isLoading, limit]);
 
   useEffect(() => {
-    fetchPokemons();
-  }, [offset]);
+    if (offset === pokemons.length) {
+      fetchPokemons();
+    }
+  }, [offset, fetchPokemons]);
 
   return { pokemons, isLoading, error, fetchNextPage };
 };

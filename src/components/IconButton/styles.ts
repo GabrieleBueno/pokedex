@@ -1,17 +1,7 @@
 import styled, { css } from 'styled-components/native';
 
-interface ContainerProps {
-  bgColor: string;
-}
-
-export const Container = styled.TouchableOpacity<ContainerProps>`
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  margin: 8px;
-  padding: 16px;
-  border-radius: 8px;
-  background-color: ${({ bgColor }) => bgColor};
+export const Container = styled.TouchableOpacity`
+  padding: 32px 16px;
 `;
 
 export const Avatar = styled.Image`

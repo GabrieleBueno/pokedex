@@ -1,47 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import { Loading } from '@/components/Loading';
+import { Header } from './components/Header';
+import { Search } from './components/Search';
+import { List } from './components/List';
+
+import { useGetPokemons } from '@/service/hooks/useGetPokemons';
+import { useSearchPokemon } from '@/service/hooks/useSearchPokemon';
 
 import { Container } from './styles';
-import { FlatList } from 'react-native';
-import ListItem from '@/components/ListItem';
-import { Header } from '@/components/Header';
-import { Search } from '@/components/Search';
-import { useGetPokemons } from '@/service/hooks/useGetPokemons';
-import { FooterLoading } from '@/components/FooterLoading';
 
 export function Home() {
+  const [searchText, setSearchText] = useState('');
+
   const { pokemons, isLoading, fetchNextPage } = useGetPokemons();
+  const { isLoading: isLoadingSearch, fetchSearchPokemon } = useSearchPokemon(
+    searchText.toLocaleLowerCase()
+  );
 
-  const renderItem = ({ item }) => {
-    return <ListItem {...item} />;
-  };
+  const handleSearch = useCallback((text: string) => {
+    setSearchText(text);
+  }, []);
 
-  const renderListFooter = () => {
-    if (!isLoading || !pokemons.length) return null;
+  const onSearch = useCallback(() => {
+    if (!searchText) return;
+    fetchSearchPokemon();
+    setSearchText('');
+  }, [searchText, fetchSearchPokemon]);
 
-    return <FooterLoading />;
-  };
-
-  const handleSearch = () => {};
+  if (isLoadingSearch) return <Loading />;
 
   return (
     <Container>
       <Header />
 
       <Search
-        placeholder="Type the Pokémon name"
-        onSearch={handleSearch}
-        autoCorrect={false}
+        value={searchText}
+        onChangeText={handleSearch}
+        onPressSearch={onSearch}
       />
 
-      <FlatList
-        data={pokemons}
-        renderItem={renderItem}
-        numColumns={2}
-        keyExtractor={(item) => `${item.id}-${item.name}`}
-        showsVerticalScrollIndicator={false}
-        onEndReached={fetchNextPage}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderListFooter}
+      <List
+        pokemons={pokemons}
+        fetchNextPage={fetchNextPage}
+        isLoading={isLoading}
       />
     </Container>
   );

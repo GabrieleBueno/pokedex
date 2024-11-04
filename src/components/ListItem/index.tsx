@@ -1,20 +1,24 @@
-import { POKEMON_TYPE_COLORS } from '@/assets/typeColors';
-import { Container, Avatar, Title, Identification } from './styles';
 import React from 'react';
 
+import { formatToThreeDigits } from '@/utils';
+
+import type { Pokemon } from '@/service/types';
+
+import { Container, Avatar, Title, Identification } from './styles';
+
 type ListItemProps = {
-  id?: string;
-  name: string;
-  image: string;
+  onPress: (id: string) => void;
+  pokemon: Pokemon;
 };
 
-function ListItem({ id, name, image, ...rest }: ListItemProps) {
+function ListItem({ onPress, pokemon }: ListItemProps) {
+  const { id, name, image, type } = pokemon;
+
   return (
-    <Container style={{ backgroundColor: POKEMON_TYPE_COLORS[rest.type.name] }}>
+    <Container bgColor={type.color} onPress={() => onPress(id)}>
       <Avatar source={{ uri: image }} />
       <Title>{name}</Title>
-      <Identification>{id}</Identification>
-      <Identification>{rest.type.name}</Identification>
+      <Identification>{formatToThreeDigits(id)}</Identification>
     </Container>
   );
 }

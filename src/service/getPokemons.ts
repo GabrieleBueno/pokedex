@@ -1,4 +1,5 @@
 import api from '@/service/api';
+
 import type { PokemonData, PokemonResult } from './types';
 
 export const getPokemons = async (
