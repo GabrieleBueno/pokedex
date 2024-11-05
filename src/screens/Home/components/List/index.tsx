@@ -21,7 +21,7 @@ export function List({ pokemons, fetchNextPage, isLoading }: ListProps) {
   };
 
   const renderItem = ({ item }: { item: Pokemon }) => (
-    <ListItem onPress={() => navigateToDetails(item.id)} pokemon={item} />
+    <ListItem onPress={navigateToDetails} pokemon={item} />
   );
 
   const renderListFooter = () => {
@@ -36,7 +36,8 @@ export function List({ pokemons, fetchNextPage, isLoading }: ListProps) {
         data={pokemons}
         renderItem={renderItem}
         numColumns={2}
-        keyExtractor={(item) => `${item.id}-${item.name}`}
+        initialNumToRender={8}
+        keyExtractor={(item) => item.name}
         showsVerticalScrollIndicator={false}
         onEndReached={fetchNextPage}
         onEndReachedThreshold={0.5}
