@@ -1,7 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import theme from '@/theme';
 import { Home } from '@/screens/Home';
 import { PokemonDetails } from '@/screens/PokemonDetails';
+
 import type { RootStackParamList } from './types';
 
 const { Navigator, Screen } = createNativeStackNavigator<RootStackParamList>();
@@ -16,6 +18,8 @@ export function AppRoutes() {
         options={{
           headerTransparent: true,
           headerTitleAlign: 'center',
+          headerBackTitleVisible: false,
+          headerTintColor: theme.COLORS.PRIMARY,
         }}
       />
     </Navigator>
